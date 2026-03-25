@@ -1,0 +1,25 @@
+
+import pandas as pd
+
+# Extract
+data = pd.DataFrame({
+    "Temp": [30, 25, None, 28]
+})
+
+# Transform
+data = data.fillna(data.mean())
+
+# Load (just print)
+print(data)
+import pandas as pd
+
+# Extract
+data = pd.DataFrame({
+    "Temp": [30, 25, None, 28]
+})
+
+# Transform
+data = data.fillna(data.mean())
+
+# Load (just print)
+print(data)
