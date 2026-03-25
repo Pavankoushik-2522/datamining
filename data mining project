@@ -1,0 +1,175 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy import stats
+
+# Load dataset
+df = pd.read_csv("Attendance_Prediction_Modified.csv")
+
+# -------------------------------
+# 1. Missing Values
+# -------------------------------
+
+# Before Cleaning
+plt.figure(figsize=(10,6))
+sns.heatmap(df.isnull(), cbar=False, cmap="viridis")
+plt.title("Missing Values Heatmap (Before Cleaning)")
+plt.show()
+
+# Cleaning step: fill missing with median for numeric columns
+df_clean = df.fillna(df.median(numeric_only=True))
+
+# After Cleaning
+plt.figure(figsize=(10,6))
+sns.heatmap(df_clean.isnull(), cbar=False, cmap="viridis")
+plt.title("Missing Values Heatmap (After Cleaning)")
+plt.show()
+
+# -------------------------------
+# 2. Duplicate Data
+# -------------------------------
+
+# Before Cleaning
+duplicates = df[df.duplicated()]
+plt.figure(figsize=(6,4))
+plt.bar(["Unique Rows", "Duplicate Rows"], [df.shape[0]-duplicates.shape[0], duplicates.shape[0]], color=["green","red"])
+plt.title("Duplicate Data Count (Before Cleaning)")
+plt.show()
+
+# Cleaning step: remove duplicates
+df_clean = df_clean.drop_duplicates()
+
+# After Cleaning
+duplicates_after = df_clean[df_clean.duplicated()]
+plt.figure(figsize=(6,4))
+plt.bar(["Unique Rows", "Duplicate Rows"], [df_clean.shape[0]-duplicates_after.shape[0], duplicates_after.shape[0]], color=["green","red"])
+plt.title("Duplicate Data Count (After Cleaning)")
+plt.show()
+
+# -------------------------------
+# 3. Outliers
+# -------------------------------
+
+numeric_cols = df.select_dtypes(include=['float64','int64']).columns
+
+# Before Cleaning
+for col in numeric_cols:
+    plt.figure(figsize=(6,4))
+    sns.boxplot(x=df[col])
+    plt.title(f"Outlier Detection in {col} (Before Cleaning)")
+    plt.show()
+
+# Cleaning step: remove outliers using Z-score
+for col in numeric_cols:
+    z_scores = stats.zscore(df_clean[col].dropna())
+    abs_z_scores = abs(z_scores)
+    filtered_entries = (abs_z_scores < 3)
+    df_clean = df_clean[filtered_entries]
+
+# After Cleaning
+for col in numeric_cols:
+    plt.figure(figsize=(6,4))
+    sns.boxplot(x=df_clean[col])
+    plt.title(f"Outlier Detection in {col} (After Cleaning)")
+    plt.show()
+Patient_ID,Age,Gender,Disease,Blood_Pressure,Sugar_Level,Cholesterol,Admission_Type
+1,45,M,Diabetes,140,210,220,Emergency
+2,50,F,Hypertension,150,?,240,Regular
+3,36,M,Fever,120,95,180,Regular
+4,60,F,Heart Disease,160,180,260,Emergency
+5,29,M,Malaria,110,90,?,Regular
+6,48,F,Diabetes,145,200,230,Emergency
+7,52,M,Hypertension,?,170,210,Regular
+8,33,F,Fever,118,92,175,Regular
+9,41,M,Diabetes,138,205,225,Emergency
+10,55,F,Heart Disease,165,190,270,Emergency
+11,38,M,Malaria,115,88,170,Regular
+12,47,F,Diabetes,142,215,?,Regular
+13,62,M,Heart Disease,170,200,280,Emergency
+14,30,F,Fever,120,NA,185,Regular
+15,44,M,Hypertension,148,165,215,Regular
+16,51,F,Diabetes,150,220,235,Emergency
+17,39,M,Malaria,112,85,175,Regular
+18,46,F,Hypertension,155,175,240,Regular
+19,28,M,Fever,118,90,180,Regular
+20,63,F,Heart Disease,172,195,290,Emergency
+21,42,M,Diabetes,140,210,220,Regular
+22,49,F,Hypertension,150,?,230,Regular
+23,35,M,Fever,118,95,175,Regular
+24,61,F,Heart Disease,168,185,275,Emergency
+25,27,M,Malaria,110,88,?,Regular
+26,53,F,Diabetes,146,205,240,Emergency
+27,40,M,Hypertension,152,170,225,Regular
+28,31,F,Fever,120,92,180,Regular
+29,45,M,Diabetes,138,215,230,Regular
+30,58,F,Heart Disease,165,190,270,Emergency
+31,37,M,Malaria,115,85,175,Regular
+32,50,F,Diabetes,148,220,?,Emergency
+33,54,M,Hypertension,160,175,240,Regular
+34,29,F,Fever,118,90,178,Regular
+35,43,M,Diabetes,142,205,225,Regular
+36,60,F,Heart Disease,170,200,285,Emergency
+37,33,M,Malaria,112,88,170,Regular
+38,48,F,Hypertension,150,170,235,Regular
+39,26,M,Fever,116,NA,172,Regular
+40,57,F,Heart Disease,168,195,275,Emergency
+41,44,M,Diabetes,140,210,220,Regular
+42,51,F,Hypertension,155,165,230,Regular
+43,36,M,Fever,120,95,180,Regular
+44,62,F,Heart Disease,172,200,290,Emergency
+45,30,M,Malaria,110,85,175,Regular
+46,49,F,Diabetes,145,215,235,Emergency
+47,52,M,Hypertension,158,170,245,Regular
+48,34,F,Fever,118,92,178,Regular
+49,46,M,Diabetes,142,208,230,Regular
+50,59,F,Heart Disease,168,190,280,Emergency
+51,41,M,Malaria,115,88,170,Regular
+52,53,F,Diabetes,150,220,240,Emergency
+53,47,M,Hypertension,160,175,250,Regular
+54,28,F,Fever,120,90,180,Regular
+55,45,M,Diabetes,138,210,225,Regular
+56,61,F,Heart Disease,170,195,285,Emergency
+57,32,M,Malaria,112,85,175,Regular
+58,48,F,Hypertension,150,170,235,Regular
+59,37,M,Fever,118,95,180,Regular
+60,55,F,Heart Disease,165,188,270,Emergency
+61,43,M,Diabetes,140,212,220,Regular
+62,50,F,Hypertension,152,?,230,Regular
+63,35,M,Fever,118,95,178,Regular
+64,60,F,Heart Disease,168,195,275,Emergency
+65,29,M,Malaria,110,88,170,Regular
+66,52,F,Diabetes,148,220,240,Emergency
+67,40,M,Hypertension,158,172,245,Regular
+68,33,F,Fever,120,90,180,Regular
+69,46,M,Diabetes,142,208,230,Regular
+70,58,F,Heart Disease,168,190,280,Emergency
+71,38,M,Malaria,115,85,175,Regular
+72,49,F,Diabetes,150,215,235,Emergency
+73,54,M,Hypertension,160,175,250,Regular
+74,27,F,Fever,118,92,178,Regular
+75,44,M,Diabetes,140,210,225,Regular
+76,62,F,Heart Disease,170,200,290,Emergency
+77,31,M,Malaria,112,88,170,Regular
+78,48,F,Hypertension,150,170,235,Regular
+79,36,M,Fever,118,95,180,Regular
+80,57,F,Heart Disease,165,190,275,Emergency
+81,45,M,Diabetes,138,210,220,Regular
+82,51,F,Hypertension,155,165,230,Regular
+83,34,M,Fever,120,92,178,Regular
+84,60,F,Heart Disease,168,195,280,Emergency
+85,29,M,Malaria,110,85,175,Regular
+86,47,F,Diabetes,145,220,235,Emergency
+87,53,M,Hypertension,160,175,250,Regular
+88,30,F,Fever,118,90,180,Regular
+89,42,M,Diabetes,140,208,225,Regular
+90,59,F,Heart Disease,170,195,285,Emergency
+91,37,M,Malaria,115,88,170,Regular
+92,50,F,Diabetes,150,215,240,Emergency
+93,55,M,Hypertension,162,178,255,Regular
+94,28,F,Fever,118,92,178,Regular
+95,44,M,Diabetes,140,210,225,Regular
+96,63,F,Heart Disease,172,200,290,Emergency
+97,33,M,Malaria,112,85,175,Regular
+98,48,F,Hypertension,150,170,235,Regular
+99,36,M,Fever,118,95,180,Regular
+100,58,F,Heart Disease,168,190,280,Emergency
